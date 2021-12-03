@@ -1,5 +1,6 @@
 let Assignment = require('../model/assignment');
 
+/* SANS LA PAGINATION
 // Récupérer tous les assignments (GET)
 function getAssignments(req, res){
     console.log("RECU REQUETE POUR AVOIR TOUS LES ASSIGNMENTS")
@@ -11,7 +12,29 @@ function getAssignments(req, res){
         res.send(assignments);
     });
 }
+*/
 
+// AVEC PAGINATION
+// va récupérer page et limit dans l'URL 
+// ex: http:localhost:8010/api/assignments?page=4&limit=20
+
+// Récupérer tous les assignments (GET)
+function getAssignments(req, res) {
+    var aggregateQuery = Assignment.aggregate();
+    Assignment.aggregatePaginate(aggregateQuery,
+      {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+      },
+      (err, assignments) => {
+        if (err) {
+          res.send(err);
+        }
+        res.send(assignments);
+      }
+    );
+   }
+   
 // Récupérer un assignment par son id (GET)
 function getAssignment(req, res){
     console.log("RECU REQUETE POUR AVOIR UN  ASSIGNMENT id=" + req.params.id)
